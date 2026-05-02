@@ -583,7 +583,7 @@ tr:hover td { background: var(--bg); }
     <div class="login-heading">Bienvenido de vuelta</div>
     <div class="login-sub">Ingresa tus credenciales para acceder al sistema de vigilancia de contratos públicos.</div>
     <label class="login-label">Correo electrónico</label>
-    <input class="login-input" type="email" placeholder="daniel.briceno@camara.gov.co" id="login-email" />
+    <input class="login-input" type="email" placeholder="demo@secopvigia.co" id="login-email" />
     <label class="login-label">Contraseña</label>
     <input class="login-input" type="password" placeholder="••••••••••" id="login-pass" onkeydown="if(event.key==='Enter') doLogin()" />
     <button class="login-btn" onclick="doLogin()">Ingresar al sistema →</button>
@@ -698,10 +698,10 @@ tr:hover td { background: var(--bg); }
       </div>
     </nav>
     <div class="sidebar-user" onclick="doLogout()">
-      <div class="user-avatar">DB</div>
+      <div class="user-avatar">SV</div>
       <div>
-        <div class="user-name">Daniel Briceño</div>
-        <div class="user-role">Representante a la Cámara</div>
+        <div class="user-name">Usuario Demo</div>
+        <div class="user-role">Investigador Anticorrupción</div>
       </div>
       <div class="user-logout">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1100,10 +1100,10 @@ tr:hover td { background: var(--bg); }
               <div class="settings-section">
                 <div class="settings-title">Perfil de usuario</div>
                 <div class="settings-sub">Información de tu cuenta en SECOP Vigía</div>
-                <div class="settings-row"><div><div class="sr-label">Nombre completo</div></div><input class="settings-input" value="Daniel Briceño" /></div>
-                <div class="settings-row"><div><div class="sr-label">Correo electrónico</div></div><input class="settings-input" value="daniel.briceno@camara.gov.co" /></div>
-                <div class="settings-row"><div><div class="sr-label">Cargo</div></div><input class="settings-input" value="Representante a la Cámara" /></div>
-                <div class="settings-row"><div><div class="sr-label">Circunscripción</div></div><input class="settings-input" value="Bogotá D.C." /></div>
+                <div class="settings-row"><div><div class="sr-label">Nombre completo</div></div><input class="settings-input" value="Usuario Demo" /></div>
+                <div class="settings-row"><div><div class="sr-label">Correo electrónico</div></div><input class="settings-input" value="demo@secopvigia.co" /></div>
+                <div class="settings-row"><div><div class="sr-label">Cargo</div></div><input class="settings-input" value="Investigador" /></div>
+                <div class="settings-row"><div><div class="sr-label">Cobertura</div></div><input class="settings-input" value="Nacional" /></div>
               </div>
             </div>
           </div>
@@ -1239,16 +1239,13 @@ async function callViewAI(prompt, outId) {
   const out = document.getElementById(outId);
   out.innerHTML = '<span class="spin"></span> Analizando...';
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1000,
-        system:'Eres un sistema de inteligencia anticorrupción especializado en SECOP Colombia. Apoyas al representante Daniel Briceño. Eres preciso, técnico y orientado a la acción investigativa. Responde en español.',
-        messages:[{role:'user',content:prompt}]
-      })
+    const resp = await fetch('https://bgbhfvanfvllxhiumnlh.supabase.co/functions/v1/anthropic-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
     });
     const data = await resp.json();
-    out.textContent = data.content?.find(b=>b.type==='text')?.text || 'Sin respuesta.';
+    out.textContent = data.text || data.error || 'Sin respuesta.';
   } catch(e) { out.textContent = 'Error de conexión con el servicio de IA.'; }
 }
 async function askNetNode(p) { await callViewAI(p+' Máximo 180 palabras en español.', 'red-ai-out'); }
