@@ -1,0 +1,356 @@
+category: "Learning with AI"
+category_id: 11
+source_file: "guide/learning-with-ai.md"
+
+questions:
+  - id: "11-001"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power", "pm"]
+    question: "What are the three developer patterns when using AI, according to the Learning with AI guide?"
+    options:
+      a: "Beginner, Intermediate, Expert"
+      b: "Dependent, Avoidant, Augmented"
+      c: "Passive, Active, Proactive"
+      d: "Consumer, Producer, Creator"
+    correct: "b"
+    explanation: |
+      The three patterns are: Dependent (copy-paste without understanding, can't debug AI code), Avoidant (refuses AI on principle, slower than peers), and Augmented (uses AI critically, understands everything). The goal is to become Augmented - using AI for leverage while maintaining deep understanding.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "The Three Patterns"
+      anchor: "#the-three-patterns"
+
+  - id: "11-002"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "What does UVAL stand for in the AI learning protocol?"
+    options:
+      a: "Use, Validate, Apply, Learn"
+      b: "Understand, Verify, Apply, Learn"
+      c: "Understand, Validate, Analyze, Learn"
+      d: "Use, Verify, Analyze, Log"
+    correct: "b"
+    explanation: |
+      UVAL stands for: Understand First (the 15-minute rule), Verify (ensure you actually learned), Apply (transform knowledge into skill through modification), Learn (capture insights for long-term retention). This protocol ensures you're learning, not just copying.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "The UVAL Protocol"
+      anchor: "#the-uval-protocol"
+
+  - id: "11-003"
+    difficulty: "junior"
+    profiles: ["junior", "senior"]
+    question: "In the Quick Self-Check, if you score 0-2 'yes' answers, what does this indicate?"
+    options:
+      a: "You're an augmented developer"
+      b: "You're on track with room for optimization"
+      c: "You're at dependency risk - outsourcing thinking"
+      d: "You're an AI avoidant"
+    correct: "c"
+    explanation: |
+      A score of 0-2 yes answers indicates dependency risk - you're outsourcing your thinking to AI. The 5 questions test: can you explain AI-generated code, have you debugged without AI, do you know WHY solutions work, could you write the code yourself, do you know AI's limitations. Low scores mean you should read the "Breaking Dependency" section.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Quick Self-Check"
+      anchor: "#quick-self-check-start-here"
+
+  - id: "11-004"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the '15-Minute Rule' in the UVAL protocol's 'Understand First' step?"
+    options:
+      a: "Limit AI usage to 15 minutes per day"
+      b: "A 4-step protocol: State problem, Brainstorm approaches, Identify gaps, THEN ask AI"
+      c: "Wait 15 minutes after getting AI response before using it"
+      d: "Spend 15 minutes explaining AI code to a colleague"
+    correct: "b"
+    explanation: |
+      The 15-minute rule is a specific protocol: (1) State the problem in ONE sentence (2 min), (2) Brainstorm 3 possible approaches (5 min), (3) Identify your knowledge gaps (3 min), (4) THEN ask AI with a much better question (5 min). This forces you to think before asking, resulting in better questions and faster learning.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "U — Understand First"
+      anchor: "#u--understand-first-the-15-minute-rule"
+
+  - id: "11-005"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the 'Explain It Back' technique in the UVAL protocol's Verify step?"
+    options:
+      a: "Ask AI to explain its own code"
+      b: "Write documentation for the code"
+      c: "If you can't explain the code to a colleague, you haven't learned it"
+      d: "Record yourself explaining and review later"
+    correct: "c"
+    explanation: |
+      The rule is simple: if you can't explain the code to a colleague, you don't understand it. This is the verification step - you must be able to articulate WHY the solution works, not just THAT it works. The guide recommends using a /explain-back slash command that asks YOU to explain AI-generated code.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "V — Verify"
+      anchor: "#v--verify-explain-it-back"
+
+  - id: "11-006"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "In the 30-Day Progression Plan, what is the AI usage ratio for Week 1?"
+    options:
+      a: "0-20% AI usage"
+      b: "40-50% AI usage"
+      c: "60-70% AI usage"
+      d: "70-80% AI usage"
+    correct: "a"
+    explanation: |
+      Week 1 focuses on foundations with 0-20% AI usage: Days 1-2 build feature WITHOUT AI (0%), Days 4-5 refactor with AI review only (20%), Day 6 debug without AI (0%). The goal is to build (or rebuild) core skills without heavy AI reliance. Success criteria: can explain every line you wrote.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "30-Day Progression Plan"
+      anchor: "#30-day-progression-plan"
+
+  - id: "11-007"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What AI usage ratio does the 30-Day Plan recommend for Week 4 (Augmented stage)?"
+    options:
+      a: "30-40%"
+      b: "50-60%"
+      c: "70%"
+      d: "90-100%"
+    correct: "c"
+    explanation: |
+      Week 4 (Augmented stage) recommends 70% AI usage with the UVAL protocol. The progression is: Week 1 (0-20%), Week 2 (30-40%), Week 3 (50-60%), Week 4 (70%). Success criteria for Week 4: you're fast AND you understand everything. The cap at 70% ensures you maintain skills.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "30-Day Progression Plan"
+      anchor: "#week-4-augmented"
+
+  - id: "11-008"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power", "pm"]
+    question: "According to the guide, what is the metaphor for AI in development?"
+    options:
+      a: "AI is your co-pilot"
+      b: "AI is your GPS"
+      c: "AI is your assistant"
+      d: "AI is your teacher"
+    correct: "b"
+    explanation: |
+      AI is compared to GPS: great for getting somewhere fast, dangerous if you lose the ability to navigate without it, truly useful when you understand the map AND use the GPS. A developer who only copy-pastes AI output is like a driver who can't read a map - fine until the GPS fails or someone asks for directions.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "The Problem in 60 Seconds"
+      anchor: "#the-problem-in-60-seconds"
+
+  - id: "11-009"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What is a 'Red Flag' sign of AI dependency according to the checklist?"
+    options:
+      a: "Using AI for complex algorithms"
+      b: "Can't start coding without AI"
+      c: "Using AI for code reviews"
+      d: "Asking AI to explain concepts"
+    correct: "b"
+    explanation: |
+      "Can't start without AI" is a red flag indicating you've outsourced problem decomposition. Other red flags: don't understand AI's code, can't debug AI errors, anxiety without AI, rejected in interviews, always ask "how" never "why", every solution looks the same. Immediate action: code 30 min daily without AI.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Red Flags Checklist"
+      anchor: "#red-flags-checklist"
+
+  - id: "11-010"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the 'Apply' step's core principle in the UVAL protocol?"
+    options:
+      a: "Apply the code directly to production"
+      b: "Transform knowledge into skill through MODIFICATION, not copying"
+      c: "Apply code reviews to all AI-generated code"
+      d: "Apply unit tests to verify correctness"
+    correct: "b"
+    explanation: |
+      The Apply step requires modification, not copy-paste. You must change at least one element (variable name, structure, edge case handling). Why? Modification forces understanding. Copying is passive; modifying requires you to engage with the code and understand how it works.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "A — Apply"
+      anchor: "#a--apply-transform-dont-copy"
+
+  - id: "11-011"
+    difficulty: "senior"
+    profiles: ["junior", "senior", "power"]
+    question: "What CLAUDE.md configuration enables 'Learning Mode' with Claude Code?"
+    options:
+      a: "## Learning Mode - Ask me questions before generating code"
+      b: "## Strict Mode - Never generate code directly"
+      c: "## Teaching Mode - Always explain before showing"
+      d: "## Quiz Mode - Test before implementing"
+    correct: "a"
+    explanation: |
+      Learning Mode in CLAUDE.md prompts Claude to ask questions before generating: "What approaches have I considered?", "What specifically am I stuck on?", "What do I expect the solution to look like?". This implements the UVAL protocol's Understand step directly in your workflow.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Claude Code for Learning"
+      anchor: "#claude-code-for-learning-not-just-producing"
+
+  - id: "11-012"
+    difficulty: "senior"
+    profiles: ["junior", "senior", "power"]
+    question: "What hook event is recommended for capturing daily learning?"
+    options:
+      a: "PreToolUse - before each command"
+      b: "PostToolUse - after each edit"
+      c: "Stop - when session ends"
+      d: "Notification - on alerts"
+    correct: "c"
+    explanation: |
+      The learning-capture.sh hook uses the Stop event (session end) to prompt: "What's ONE thing you learned today?" This logs to ~/claude-learnings.md automatically. It's lightweight (asks one question) so you'll actually use it, unlike verbose learning journals.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Hooks That Build Habits"
+      anchor: "#hooks-that-build-habits"
+
+  - id: "11-013"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power", "pm"]
+    question: "What is the 'Dependent' pattern's main risk according to the guide?"
+    options:
+      a: "Slower than peers"
+      b: "Unemployable"
+      c: "Left behind"
+      d: "Overworked"
+    correct: "b"
+    explanation: |
+      The Dependent pattern's risk is becoming unemployable. Signs: copy-paste without understanding, can't debug AI code, anxiety without AI. In interviews: can't whiteboard basics, struggles with "why this approach?", asks to look up fundamentals. You ship code you can't explain - when it breaks, you're stuck.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Pattern 1: Dependent"
+      anchor: "#pattern-1-dependent"
+
+  - id: "11-014"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the Weekly Self-Audit question that detects dependency?"
+    options:
+      a: "How many lines of code did I write?"
+      b: "Am I faster than last month? Am I smarter?"
+      c: "How much did I use AI this week?"
+      d: "Did I meet all my deadlines?"
+    correct: "b"
+    explanation: |
+      The key question is: "Am I faster than last month? Am I smarter?" If you're faster but NOT smarter, you're building dependency. Other weekly questions: What did I learn that I didn't know before? Could I have done this without AI? Did I understand everything I shipped?
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Weekly Self-Audit"
+      anchor: "#weekly-self-audit"
+
+  - id: "11-015"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the recommended approach for 'Avoidant' developers (Pattern 2)?"
+    options:
+      a: "Continue avoiding AI to maintain purity"
+      b: "Start with AI review of YOUR code, not AI-generated code"
+      c: "Immediately switch to 100% AI usage"
+      d: "Wait until AI tools are more mature"
+    correct: "b"
+    explanation: |
+      For Avoidant developers, the guide recommends gradual adoption: start with AI reviewing YOUR code (you stay in control), then move to AI explaining concepts you implement, then AI-assisted work. This respects your instinct for understanding while gaining AI benefits. Pure avoidance means being slower without being smarter.
+    doc_reference:
+      file: "guide/learning-with-ai.md"
+      section: "Embracing AI Tools"
+      anchor: "#embracing-ai-tools"
+
+  - id: "11-016"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What are the 3 failure modes identified in Addy Osmani's '80% Problem' of agentic coding?"
+    options:
+      a: "Context loss, token overflow, hallucination"
+      b: "Overengineering, assumption propagation, sycophantic agreement"
+      c: "Slow responses, wrong language, missed tests"
+      d: "Memory leaks, race conditions, deadlocks"
+    correct: "b"
+    explanation: |
+      Addy Osmani's "80% Problem" identifies 3 failure modes:
+
+      1. **Overengineering** - AI adds unnecessary complexity (abstraction layers, premature optimization)
+      2. **Assumption propagation** - One wrong assumption cascades through the codebase
+      3. **Sycophantic agreement** - AI agrees with bad ideas instead of pushing back
+
+      The 80% refers to AI getting you 80% of the way, with the last 20% requiring deep human understanding.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "Practitioner Insights"
+      anchor: "#practitioner-insights"
+
+  - id: "11-017"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What are the 3 symptoms of vibe coding 'context overload'?"
+    options:
+      a: "Memory leaks, slow startup, API rate limits"
+      b: "Big-bang context dumps, 5K+ line prompts, performance degradation"
+      c: "Lost files, broken imports, missing tests"
+      d: "Excessive commits, merge conflicts, branch proliferation"
+    correct: "b"
+    explanation: |
+      Context overload symptoms in vibe coding:
+
+      1. **Big-bang context dumps** - Pasting entire codebases into prompts
+      2. **5K+ line prompts** - Exceeding effective context window usage
+      3. **Performance degradation** - Claude's quality drops as context grows
+
+      The fix: progressive disclosure (feed context incrementally), use CLAUDE.md for persistent context, and start fresh sessions between phases.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "Vibe Coding Anti-Patterns"
+      anchor: "#vibe-coding-anti-patterns"
+
+  - id: "11-018"
+    difficulty: "senior"
+    profiles: ["senior", "power", "pm"]
+    question: "What are the two levels of Team-Level Steering Metrics for AI-augmented engineering?"
+    options:
+      a: "Level 1 = individual productivity; Level 2 = team productivity"
+      b: "Level 1 = DORA delivery health (Deployment Frequency + Lead Time); Level 2 = AI adoption quality (CFR by code origin, review time comparison)"
+      c: "Level 1 = code quality; Level 2 = business outcomes"
+      d: "Level 1 = token usage; Level 2 = cost per feature"
+    correct: "b"
+    explanation: |
+      Team-Level Steering Metrics operate at two levels. Level 1 tracks DORA delivery health: Deployment Frequency and Lead Time for Changes, which measure whether AI is actually accelerating delivery. Level 2 goes deeper into AI adoption quality: Change Failure Rate broken down by code origin (AI-generated vs human-written), and review time comparison between the two. Level 2 metrics catch the velocity trap — teams that look fast on DORA but are accumulating hidden risk.
+    doc_reference:
+      file: "guide/roles/learning-with-ai.md"
+      section: "Team-Level Steering Metrics"
+      anchor: "#team-level-steering-metrics"
+
+  - id: "11-019"
+    difficulty: "senior"
+    profiles: ["senior", "power", "pm"]
+    question: "What is the velocity trap in AI-augmented teams, and why is DORA 'High' on deployment frequency not sufficient evidence of health?"
+    options:
+      a: "Teams deploy too slowly because AI adds overhead"
+      b: "High deployment frequency can coexist with burnout, skill atrophy, and shallow reviews — DORA measures pace, not sustainability or quality"
+      c: "DORA metrics are only valid for teams of 10 or more engineers"
+      d: "Deployment frequency causes merge conflicts when AI generates too many branches"
+    correct: "b"
+    explanation: |
+      The velocity trap: a team rated High on DORA deployment frequency can simultaneously experience burnout (engineers rubber-stamping AI output), skill atrophy (engineers losing the ability to reason about code independently), and shallow reviews (speed pressure discourages deep inspection). DORA measures pace of delivery, but not whether the team understands what it is shipping. This is why Level 2 metrics (CFR by code origin, review time) exist — to surface quality degradation that hides behind fast numbers.
+    doc_reference:
+      file: "guide/roles/learning-with-ai.md"
+      section: "Team-Level Steering Metrics"
+      anchor: "#team-level-steering-metrics"
+
+  - id: "11-020"
+    difficulty: "intermediate"
+    profiles: ["senior", "power", "pm"]
+    question: "What is the '3 metrics, 5 minutes Monday ritual' for tech leads, and what does it protect against?"
+    options:
+      a: "A daily standup format that replaces sprint retrospectives"
+      b: "A weekly check of deployment frequency, lead time, and test coverage to satisfy compliance requirements"
+      c: "A weekly review of three steering metrics in under five minutes to catch drift early, before velocity-trap patterns solidify into team habits"
+      d: "A tool that automatically generates weekly reports from git history"
+    correct: "c"
+    explanation: |
+      The Monday ritual is a lightweight weekly habit for tech leads: spend five minutes reviewing three steering metrics (typically Deployment Frequency, CFR by code origin, and review time delta). The goal is early detection of drift. Velocity traps, skill atrophy, and review shortcuts develop gradually — weekly check-ins catch the signal before it becomes a cultural pattern that is hard to reverse. Five minutes is intentionally short: the ritual should have near-zero friction so it actually happens.
+    doc_reference:
+      file: "guide/roles/learning-with-ai.md"
+      section: "Team-Level Steering Metrics"
+      anchor: "#team-level-steering-metrics"

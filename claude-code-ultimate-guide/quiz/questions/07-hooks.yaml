@@ -1,0 +1,567 @@
+category: "Hooks"
+category_id: 7
+source_file: "guide/ultimate-guide.md"
+
+questions:
+  - id: "07-001"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "What exit code should a hook return to BLOCK an operation?"
+    options:
+      a: "0"
+      b: "1"
+      c: "2"
+      d: "255"
+    correct: "c"
+    explanation: |
+      Hook exit codes have specific meanings:
+
+      - **Exit code 0**: Success - Allow the operation to proceed
+      - **Exit code 2**: Block - Prevent the operation from executing. Important: exit code 2 silently discards any stdout/JSON output — only stderr is forwarded to Claude as an error message.
+      - **Other codes**: Error - Log the error and continue
+
+      This is critical for security hooks that need to prevent dangerous commands.
+      For example, a hook that detects `rm -rf /` should `exit 2` to block execution and write a reason to stderr.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#exit-codes"
+
+  - id: "07-002"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "Which hook event fires BEFORE a tool is executed?"
+    options:
+      a: "BeforeToolUse"
+      b: "PreToolUse"
+      c: "ToolStart"
+      d: "OnToolCall"
+    correct: "b"
+    explanation: |
+      The `PreToolUse` event fires before any tool runs.
+
+      Claude Code supports 27 hook events, organized in 7 groups:
+      - **Lifecycle**: SessionStart, SessionEnd, Setup, Stop
+      - **Agent actions**: PreToolUse (security), PostToolUse (formatting), PostToolUseFailure (error logging)
+      - **Permissions**: PermissionRequest, PermissionDenied
+      - **Compaction**: PreCompact, PostCompact
+      - **Multi-agent**: SubagentStart, SubagentStop, TeammateIdle, TaskCompleted, TaskCreated
+      - **Configuration**: ConfigChange, InstructionsLoaded, CwdChanged
+      - **File system**: WorktreeCreate, WorktreeRemove, FileChanged
+      - **User interaction**: UserPromptSubmit, Notification, Elicitation, ElicitationResult
+
+      Hooks can also be registered session-scoped at runtime (without modifying settings.json) — this is how skills register temporary callbacks during their invocation.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.1 The Event System"
+      anchor: "#event-types"
+
+  - id: "07-003"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "How do hooks receive input data from Claude Code?"
+    options:
+      a: "As command-line arguments"
+      b: "As JSON on stdin"
+      c: "As environment variables"
+      d: "From a temporary file"
+    correct: "b"
+    explanation: |
+      Hooks receive JSON data on stdin with information about the event.
+
+      Example input structure (common fields + event-specific fields):
+      ```json
+      {
+        "session_id": "abc123",
+        "transcript_path": "/home/user/.claude/projects/.../transcript.jsonl",
+        "cwd": "/project",
+        "permission_mode": "default",
+        "hook_event_name": "PreToolUse",
+        "tool_name": "Bash",
+        "tool_input": {
+          "command": "git status"
+        }
+      }
+      ```
+
+      Common fields sent to all events: `session_id`, `transcript_path`, `cwd`, `permission_mode`, `hook_event_name`.
+
+      Hooks typically parse this with: `INPUT=$(cat)` followed by `jq` for JSON extraction.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#hook-input-stdin-json"
+
+  - id: "07-004"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "In the hook registration (settings.json), what does the `matcher` field specify?"
+    options:
+      a: "File extensions to watch"
+      b: "Regex pattern for which tools trigger the hook"
+      c: "User permission levels"
+      d: "Output format requirements"
+    correct: "b"
+    explanation: |
+      The `matcher` field is a regex pattern that determines which tools trigger the hook.
+
+      Example configuration:
+      ```json
+      {
+        "matcher": "Bash|Edit|Write",
+        "hooks": [{"type": "command", "command": "./hooks/security-check.sh"}]
+      }
+      ```
+
+      This hook would trigger for Bash, Edit, or Write tools. You can match specific tools or use `.*` to match all tools. Beyond `matcher`, hooks also support a conditional `if` field for runtime filtering — `if` evaluates a condition against the hook input JSON and skips execution if false, enabling environment-based gating (e.g., only run in CI, or only if a specific file is being edited).
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#configuration-fields"
+
+  - id: "07-005"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What is the best use case for the `UserPromptSubmit` hook event?"
+    options:
+      a: "Blocking dangerous commands"
+      b: "Auto-formatting code"
+      c: "Adding context like git status to every prompt"
+      d: "Playing notification sounds"
+    correct: "c"
+    explanation: |
+      The `UserPromptSubmit` event is ideal for context enrichment.
+
+      Use cases by event:
+      - **UserPromptSubmit**: Add context (git status, current branch, staged files)
+      - **PreToolUse**: Security validation (block dangerous commands)
+      - **PostToolUse**: Formatting, logging, quality checks
+      - **SessionStart**: Initialize environment, scan CLAUDE.md for injections
+      - **Notification**: Sound alerts, desktop notifications
+
+      The context enricher example adds git branch, last commit, and staged/unstaged info.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.3 Hook Templates"
+      anchor: "#template-3-userpromptsubmit-context-enricher"
+
+  - id: "07-006"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "What exit code allows an operation to proceed?"
+    options:
+      a: "1"
+      b: "0"
+      c: "2"
+      d: "-1"
+    correct: "b"
+    explanation: |
+      Exit code 0 means success and allows the operation to proceed.
+
+      The exit code system:
+      - **0**: Success - Allow operation
+      - **2**: Block - Prevent operation
+      - **Other**: Error - Log and continue
+
+      Always end your hooks with `exit 0` if you want to allow the operation,
+      or `exit 2` to block it.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#exit-codes"
+
+  - id: "07-007"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "Which commands should a security hook typically block?"
+    options:
+      a: "git status, npm test"
+      b: "rm -rf /, sudo rm, git push --force origin main"
+      c: "cd, ls, pwd"
+      d: "npm install, pip install"
+    correct: "b"
+    explanation: |
+      Security hooks should block dangerous operations like:
+
+      - `rm -rf /` or `rm -rf ~` - Filesystem destruction
+      - `sudo rm` - Privileged deletion
+      - `git push --force origin main` - Force push to protected branches
+      - `npm publish` - Accidental package publishing
+      - `> /dev/sda` or `dd if=` - Direct disk operations
+
+      Safe commands like `git status`, `npm test`, `ls` should be allowed.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.4 Security Hooks"
+      anchor: "#recommended-security-rules"
+
+  - id: "07-008"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What JSON structure should a hook return to send a message back to Claude?"
+    options:
+      a: '{"message": "text"}'
+      b: '{"systemMessage": "text", "hookSpecificOutput": {...}}'
+      c: '{"response": "text"}'
+      d: '{"output": "text"}'
+    correct: "b"
+    explanation: |
+      Hooks return JSON on stdout with specific fields:
+
+      ```json
+      {
+        "systemMessage": "Message shown to Claude",
+        "hookSpecificOutput": {
+          "additionalContext": "Extra information"
+        }
+      }
+      ```
+
+      - `systemMessage`: Displayed to Claude as context
+      - `hookSpecificOutput`: Additional structured data
+
+      This allows hooks to provide context that Claude can use in its responses.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#hook-output"
+
+  - id: "07-009"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What is the recommended approach for tasks that need 'understanding' vs pattern-based tasks?"
+    options:
+      a: "Both should use bash scripts"
+      b: "Both should use AI agents"
+      c: "Pattern-based use bash scripts; understanding-needed use AI agents"
+      d: "Pattern-based use AI agents; understanding-needed use bash scripts"
+    correct: "c"
+    explanation: |
+      The guide recommends choosing the right tool:
+
+      **Use Bash scripts when:**
+      - Tasks are deterministic (create branch, push)
+      - Pattern-based (check for secrets with regex)
+      - Fast, predictable, no token cost
+
+      **Use AI Agents when:**
+      - Interpretation is needed (code review quality)
+      - Context-dependent decisions
+      - Understanding and judgment required
+
+      Rule: "If you can write a regex for it, use a bash script."
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.1 The Event System"
+      anchor: "#shell-scripts-vs-ai-agents-when-to-use-what"
+
+  - id: "07-010"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "Which hook event fires AFTER a tool has finished executing?"
+    options:
+      a: "AfterToolUse"
+      b: "PostToolUse"
+      c: "ToolComplete"
+      d: "OnToolDone"
+    correct: "b"
+    explanation: |
+      The `PostToolUse` event fires after any tool completes execution.
+
+      Common use cases for PostToolUse:
+      - Auto-formatting code after edits
+      - Running linters after file changes
+      - Logging tool usage for auditing
+      - Triggering tests after code changes
+
+      The Auto-Formatter template uses PostToolUse to run Prettier after Edit/Write operations.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.1 The Event System"
+      anchor: "#event-types"
+
+  - id: "07-011"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "How do you test a security hook before deploying it?"
+    options:
+      a: "Run Claude Code and hope it works"
+      b: "Pipe test JSON to the hook script and check the exit code"
+      c: "Deploy to production and monitor"
+      d: "Security hooks cannot be tested"
+    correct: "b"
+    explanation: |
+      Test hooks by piping JSON input and checking the exit code:
+
+      ```bash
+      # Test with a blocked command
+      echo '{"tool_name":"Bash","tool_input":{"command":"rm -rf /"}}' | ./hooks/security-blocker.sh
+      echo "Exit code: $?"  # Should be 2
+
+      # Test with a safe command
+      echo '{"tool_name":"Bash","tool_input":{"command":"git status"}}' | ./hooks/security-blocker.sh
+      echo "Exit code: $?"  # Should be 0
+      ```
+
+      This ensures your hook correctly blocks dangerous commands before deployment.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.4 Security Hooks"
+      anchor: "#testing-security-hooks"
+
+  - id: "07-012"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "In Windows, how should hooks be invoked to avoid execution policy restrictions?"
+    options:
+      a: "Run as Administrator"
+      b: "Use powershell -ExecutionPolicy Bypass -File script.ps1"
+      c: "Disable all security settings"
+      d: "Convert to batch files only"
+    correct: "b"
+    explanation: |
+      Windows hooks should use the full PowerShell invocation:
+
+      ```json
+      {
+        "type": "command",
+        "command": "powershell -ExecutionPolicy Bypass -File .claude/hooks/security-check.ps1"
+      }
+      ```
+
+      This bypasses the default execution policy that might block script execution.
+      Batch files (.cmd) can also be used as an alternative for simpler hooks.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.3 Hook Templates"
+      anchor: "#windows-hook-templates"
+
+  - id: "07-013"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What does the activity logger hook example use to store logs?"
+    options:
+      a: "SQLite database"
+      b: "Plain text files"
+      c: "JSONL (JSON Lines) files"
+      d: "CSV files"
+    correct: "c"
+    explanation: |
+      The activity logger hook stores logs in JSONL format (JSON Lines).
+
+      Key features:
+      - Logs to `~/.claude/logs/activity-YYYY-MM-DD.jsonl`
+      - Each entry contains timestamp, tool name, and session ID
+      - Auto-cleanup of logs older than 7 days
+      - Uses `jq` for JSON construction
+
+      JSONL is ideal for log files as each line is a valid JSON object,
+      making it easy to append and parse.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.5 Hook Examples"
+      anchor: "#example-1-activity-logger"
+
+  - id: "07-014"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What is the default timeout for hooks in the configuration?"
+    options:
+      a: "1000ms (1 second)"
+      b: "5000ms (5 seconds)"
+      c: "30000ms (30 seconds)"
+      d: "No timeout by default"
+    correct: "b"
+    explanation: |
+      The example hook configuration shows a timeout of 5000ms (5 seconds).
+
+      ```json
+      {
+        "type": "command",
+        "command": ".claude/hooks/security-check.sh",
+        "timeout": 5000
+      }
+      ```
+
+      This prevents hooks from blocking Claude Code indefinitely.
+      For longer operations like formatting, you might increase this to 10000ms.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#hook-registration-settingsjson"
+
+  - id: "07-015"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What configuration parameter makes a hook run asynchronously (v2.1.0+)?"
+    options:
+      a: "background: true"
+      b: "async: true"
+      c: "nonblocking: true"
+      d: "mode: async"
+    correct: "b"
+    explanation: |
+      Since Claude Code v2.1.0, hooks support `async: true` in their configuration. This makes the hook fire without blocking Claude's execution. Useful for logging, notifications, or analytics hooks where you don't need to wait for the result before continuing.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "Hook Execution Model"
+      anchor: "#hook-execution-model"
+
+  - id: "07-016"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What are the 3 limitations of async hooks compared to sync hooks?"
+    options:
+      a: "Can't access stdin, can't write files, can't read environment variables"
+      b: "No exit code feedback (can't block), no additionalContext returned, no blocking capability"
+      c: "Can't use network, can't spawn processes, can't read files"
+      d: "Limited to 1s timeout, no stderr capture, no argument passing"
+    correct: "b"
+    explanation: |
+      Async hooks trade control for speed:
+
+      1. **No exit code feedback** - Can't block Claude based on success/failure
+      2. **No additionalContext** - Can't inject context back into the conversation
+      3. **No blocking capability** - Fire-and-forget only
+
+      Use async for non-critical operations (logging, telemetry). Use sync for security gates, formatting, and validation.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "Hook Execution Model"
+      anchor: "#hook-execution-model"
+
+  - id: "07-017"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "A PreToolUse hook returns `permissionDecision: \"defer\"`. What happens next and where does this work?"
+    options:
+      a: "Claude asks the user interactively for approval, in any session type"
+      b: "Claude pauses with stop_reason: \"tool_deferred\" and waits for --resume; only works in headless sessions"
+      c: "The tool is denied permanently for the rest of the session"
+      d: "Claude falls back to the default permission prompt"
+    correct: "b"
+    explanation: |
+      The `defer` permission decision (v2.1.89+) is designed exclusively for headless integrations. When returned, Claude pauses with `stop_reason: "tool_deferred"` and waits for the external orchestrator to collect input and resume the session with `--resume <session-id>`. In interactive terminal sessions, `defer` is ignored with a warning. This enables human-in-the-loop approval flows from external UIs, queues, or approval systems without breaking the session.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#hook-output"
+
+  - id: "07-018"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "When multiple PreToolUse hooks return conflicting permission decisions in v2.1.89+, what is the correct precedence order (highest to lowest)?"
+    options:
+      a: "allow > ask > defer > deny"
+      b: "deny > ask > defer > allow"
+      c: "deny > defer > ask > allow"
+      d: "ask > deny > defer > allow"
+    correct: "c"
+    explanation: |
+      Since v2.1.89, when multiple PreToolUse hooks return different `permissionDecision` values, the resolution order is: `deny` > `defer` > `ask` > `allow`. The most restrictive decision wins. A single hook returning `deny` blocks the tool even if other hooks allow it, and `defer` (pause for external approval) takes priority over `ask` (interactive prompt). Design your hook pipelines with this precedence in mind so security hooks can always override permissive ones.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#hook-output"
+
+  - id: "07-019"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What distinguishes session-scoped hooks from hooks defined in settings.json?"
+    options:
+      a: "Session-scoped hooks run with elevated permissions and can bypass security gates"
+      b: "Session-scoped hooks are registered at runtime, last only for the current session, and are never written to any config file"
+      c: "Session-scoped hooks only support the `command` type, not `http` or `agent`"
+      d: "Session-scoped hooks fire before settings.json hooks in all events"
+    correct: "b"
+    explanation: |
+      Session-scoped hooks are ephemeral: registered at runtime via the programmatic API or by skills at invocation time, they exist only for the duration of that session and disappear when it ends. Nothing is written to `settings.json` or any config file. This is exactly how skills register temporary callbacks during their invocation. Once the skill finishes or the session ends, those hooks are gone. Session-scoped hooks follow the same JSON schema as persistent hooks.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#session-scoped-hooks"
+
+  - id: "07-020"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "Which paths are ALWAYS protected and prompt for approval even when running in `bypassPermissions` mode?"
+    options:
+      a: ".env files, node_modules/, and /tmp/ paths"
+      b: ".git/, .claude/ (except .claude/worktrees/), shell config files (.bashrc, .zshrc), .gitconfig, .mcp.json, and .claude.json"
+      c: "Any file outside the current working directory"
+      d: "Only production database configs and SSH keys"
+    correct: "b"
+    explanation: |
+      The `bypassPermissions` mode auto-approves everything except a fixed set of always-protected paths. Claude Code will always prompt before modifying: the `.git/` directory, the `.claude/` directory (excluding `.claude/worktrees/`), shell config files (`.bashrc`, `.zshrc`, `.bash_profile`, `.profile`), and tool configs (`.gitconfig`, `.mcp.json`, `.claude.json`). This safety invariant holds regardless of permission mode, preventing accidental or malicious modification of the configuration layer itself.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "1.4 Permission Modes"
+      anchor: "#bypasspermissions-safety-invariant"
+
+  - id: "07-021"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What does the `Setup` hook event fire during, and what is its primary use case?"
+    options:
+      a: "After the first user message, to initialize project-specific tooling"
+      b: "During the environment setup phase at session start, for installing tools or validating prerequisites before the session accepts prompts"
+      c: "When a CLAUDE.md file is first loaded, to audit instruction content"
+      d: "Before each tool call, to prepare the execution environment"
+    correct: "b"
+    explanation: |
+      The `Setup` event fires during the environment setup phase at session start (not after the first user message). It cannot block operations. Its primary use case is installing tools, validating prerequisites, or running any initialization logic that should complete before the session begins accepting user prompts. This is different from `SessionStart` (fires when the session begins or resumes) and from `InstructionsLoaded` (fires when a CLAUDE.md file is loaded).
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.1 The Event System"
+      anchor: "#event-types"
+
+  - id: "07-022"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "Which pairing correctly maps `Elicitation` and `ElicitationResult` hook events to their use cases?"
+    options:
+      a: "Elicitation = fires when user submits a form; ElicitationResult = fires after Claude responds"
+      b: "Elicitation = fires when Claude requests information from the user (can block); ElicitationResult = fires when the response is received (cannot block)"
+      c: "Elicitation = fires on SubagentStart for data collection; ElicitationResult = fires on SubagentStop"
+      d: "Both events fire in sequence only during multi-agent orchestration"
+    correct: "b"
+    explanation: |
+      `Elicitation` fires when Claude requests information from the user, primarily in headless sessions where interactive prompts are unavailable. It can block, allowing a hook to intercept and pre-answer the question before it reaches any interactive UI (useful in CI pipelines or web frontends). `ElicitationResult` fires after the response is received and cannot block, making it suitable for logging or auditing. Together they give headless integrations full control over Claude's information-gathering flows.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.1 The Event System"
+      anchor: "#event-types"
+
+  - id: "07-023"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What is the main performance benefit of using the `if` field on hooks over handling conditions inside the hook script?"
+    options:
+      a: "The `if` field enables parallel hook execution across multiple events"
+      b: "Hooks with `if` run in a separate process pool and never time out"
+      c: "The `if` field avoids spawning the subprocess entirely when the condition is false, reducing overhead when events fire hundreds of times per session"
+      d: "The `if` field compresses hook output before sending it back to Claude"
+    correct: "c"
+    explanation: |
+      Without `if`, every PostToolUse event spawns a subprocess even when the hook logic immediately exits because the tool does not match. In large repos, PostToolUse can fire hundreds of times per session. The `if` field is evaluated by Claude Code before any subprocess is created. When the condition is false the hook is simply skipped, eliminating the subprocess spawn entirely. Moving the filter into the hook script with a `case` statement achieves the same logic but still incurs the cost of starting the process every time.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.2 Creating Hooks"
+      anchor: "#conditional-hooks-with-if"
+
+  - id: "07-024"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What does the `PostCompact` hook event allow you to do that no other lifecycle hook provides?"
+    options:
+      a: "Prevent context compaction from running when context is still small"
+      b: "Run cleanup logic after a session ends and transcripts are archived"
+      c: "Restore state or log metadata after context compaction completes"
+      d: "Inject system messages before Claude's next turn following a compaction"
+    correct: "c"
+    explanation: |
+      `PostCompact` fires after context compaction completes and cannot block. It is the only hook event scoped specifically to the compaction lifecycle. Its primary use cases are restoring state that was captured by a `PreCompact` hook before compaction ran, and logging metadata about when and how often compaction is happening. Neither `SessionStart` nor any other lifecycle hook fires in response to a compaction event, making `PostCompact` the right place for any logic that depends on knowing compaction just occurred.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "7.1 The Event System"
+      anchor: "#event-types"

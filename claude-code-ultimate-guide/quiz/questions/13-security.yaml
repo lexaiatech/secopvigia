@@ -1,0 +1,259 @@
+category: "Security Hardening"
+category_id: 13
+source_file: "guide/security-hardening.md"
+
+questions:
+  - id: "13-001"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is an 'MCP Rug Pull' attack?"
+    options:
+      a: "An MCP server that crashes unexpectedly"
+      b: "A benign MCP that turns malicious after gaining trust (no re-approval needed)"
+      c: "An MCP that uses too many tokens"
+      d: "An attack on the MCP protocol itself"
+    correct: "b"
+    explanation: |
+      An MCP Rug Pull exploits the one-time approval model: attacker publishes benign MCP → user approves once → MCP works normally (builds trust) → attacker pushes malicious update → MCP exfiltrates credentials WITHOUT re-approval. Mitigation: version pinning + hash verification.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Attack: MCP Rug Pull"
+      anchor: "#attack-mcp-rug-pull"
+
+  - id: "13-002"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What does CVE-2025-53109/53110 (EscapeRoute) exploit?"
+    options:
+      a: "Prompt injection in Claude's system prompt"
+      b: "Filesystem MCP sandbox escape via prefix bypass + symlinks"
+      c: "Memory corruption in the Bash tool"
+      d: "API key leakage in network requests"
+    correct: "b"
+    explanation: |
+      CVE-2025-53109/53110 (EscapeRoute) allows sandbox escape in Filesystem MCP via prefix bypass combined with symlinks. Severity: High. Mitigation: avoid Filesystem MCP with unrestricted access or apply the official patch. Source: Cymulate security research.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "CVE Summary (2025)"
+      anchor: "#cve-summary-2025"
+
+  - id: "13-003"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is a known limitation of permissions.deny in .claude/settings.json?"
+    options:
+      a: "It only works on macOS"
+      b: "System reminders may expose file contents before tool permission checks"
+      c: "It cannot block Bash commands"
+      d: "It requires admin privileges"
+    correct: "b"
+    explanation: |
+      permissions.deny has architectural limitations: background indexing may expose file contents via internal "system reminder" mechanism BEFORE tool permission checks are applied. This is documented in GitHub #4160. Defense-in-depth: store secrets outside project directories.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Known Security Gaps"
+      anchor: "#known-security-gaps"
+
+  - id: "13-004"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is the recommended defense-in-depth strategy for secrets protection?"
+    options:
+      a: "Only use permissions.deny"
+      b: "Store secrets outside project + external vault + PreToolUse hooks + never commit"
+      c: "Encrypt all files in the project"
+      d: "Use a VPN when running Claude Code"
+    correct: "b"
+    explanation: |
+      Defense-in-depth: (1) Store secrets outside project directories (~/.secrets/ or vault), (2) Use external secrets management (AWS Secrets Manager, 1Password), (3) Add PreToolUse hooks as secondary blocking, (4) Never commit secrets, (5) Manually review bash commands.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Defense-in-Depth Strategy"
+      anchor: "#defense-in-depth-strategy"
+
+  - id: "13-005"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "Which prompt injection evasion technique uses U+200B, U+200C, U+200D?"
+    options:
+      a: "Base64 encoding"
+      b: "RTL override"
+      c: "Zero-width characters (invisible to humans)"
+      d: "Homoglyphs"
+    correct: "c"
+    explanation: |
+      Zero-width characters (U+200B, U+200C, U+200D) make instructions invisible to humans while still being interpreted. Detection: Unicode regex pattern [\x{200B}-\x{200D}\x{FEFF}\x{202A}-\x{202E}]. Added to prompt-injection-detector.sh in v3.6.0.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Evasion Techniques"
+      anchor: "#evasion-techniques"
+
+  - id: "13-006"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "Which secret detection tool has the highest recall (88%) but lower precision (46%)?"
+    options:
+      a: "TruffleHog"
+      b: "GitGuardian"
+      c: "Gitleaks"
+      d: "detect-secrets"
+    correct: "c"
+    explanation: |
+      Gitleaks: 88% recall, 46% precision, fast (~2 min/100K commits) - best for pre-commit hooks. TruffleHog: 52% recall, 85% precision, slow - best for CI verification. GitGuardian: 80% recall, 95% precision - enterprise monitoring. detect-secrets: 60% recall, 98% precision - baseline approach.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Tool Comparison"
+      anchor: "#tool-comparison"
+
+  - id: "13-007"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is the recommended hook stack for security in settings.json?"
+    options:
+      a: "Only PostToolUse hooks for logging"
+      b: "PreToolUse (dangerous blocker, injection detector) + PostToolUse (output scanner) + SessionStart (MCP integrity)"
+      c: "No hooks - rely only on permissions.deny"
+      d: "Only UserPromptSubmit hooks"
+    correct: "b"
+    explanation: |
+      Recommended security hook stack: PreToolUse → dangerous-actions-blocker.sh (Bash), prompt-injection-detector.sh + unicode-injection-scanner.sh (Edit/Write). PostToolUse → output-secrets-scanner.sh (Bash). SessionStart → mcp-config-integrity.sh. Multiple layers for defense-in-depth.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Hook Stack Setup"
+      anchor: "#23-hook-stack-setup"
+
+  - id: "13-008"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "Which MCP servers are marked as 'Safe' in the community-vetted safe list?"
+    options:
+      a: "filesystem (unrestricted), database (prod credentials)"
+      b: "@anthropic/mcp-server-*, context7, sequential-thinking, memory"
+      c: "browser (full access), custom MCPs"
+      d: "All MCPs are safe by default"
+    correct: "b"
+    explanation: |
+      MCP Safe List: @anthropic/mcp-server-* (official), context7 (read-only docs), sequential-thinking (no external access, local), memory (local file-based). Risk: filesystem unrestricted (CVE-2025-53109), database prod (exfiltration). Unsafe: browser full access.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "MCP Safe List (Community Vetted)"
+      anchor: "#mcp-safe-list-community-vetted"
+
+  - id: "13-009"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the first action when a secret is exposed?"
+    options:
+      a: "Document the incident for post-mortem"
+      b: "Revoke the credential immediately"
+      c: "Scan the entire repo"
+      d: "Notify the team"
+    correct: "b"
+    explanation: |
+      First 15 minutes (stop the bleeding): (1) Revoke immediately - AWS delete-access-key, GitHub revoke token, Stripe roll key. (2) Confirm exposure scope. Then: audit git history, scan dependencies, check CI/CD logs. First 24 hours: rotate ALL related credentials, notify compliance, document timeline.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Secret Exposed"
+      anchor: "#31-secret-exposed"
+
+  - id: "13-010"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power", "pm"]
+    question: "What are the three security posture levels in the guide?"
+    options:
+      a: "Low, Medium, High"
+      b: "Basic (5 min), Standard (30 min), Hardened (2 hours)"
+      c: "Development, Staging, Production"
+      d: "Free, Pro, Enterprise"
+    correct: "b"
+    explanation: |
+      Security posture levels: Basic (5 min) = output scanner + dangerous blocker - for solo dev/experiments. Standard (30 min) = + injection hooks + MCP vetting - for teams/sensitive code. Hardened (2 hours) = + integrity verification + ZDR - for enterprise/production.
+    doc_reference:
+      file: "guide/security-hardening.md"
+      section: "Security Posture Levels"
+      anchor: "#security-posture-levels"
+
+  - id: "13-011"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "Which sandbox isolation approach combines microVM isolation with network policies for agent autonomy?"
+    options:
+      a: "E2B (hosted cloud sandboxes)"
+      b: "Fly.io Sprites (edge compute)"
+      c: "Docker Sandboxes (with custom templates and network policies)"
+      d: "Cloudflare Sandbox SDK"
+    correct: "c"
+    explanation: |
+      Docker Sandboxes provide microVM-level isolation with customizable network policies. Key features: custom Dockerfile templates for reproducible environments, network policies to control egress/ingress, volume mounts for persistent storage, and CPU/memory limits. This approach suits teams wanting full control over sandbox configuration while maintaining strong isolation.
+    doc_reference:
+      file: "guide/sandbox-isolation.md"
+      section: "Docker Sandboxes"
+      anchor: "#docker-sandboxes"
+
+  - id: "13-012"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power", "pm"]
+    question: "What is the GitHub Issue Auto-Creation Bug (#13797) and why is it dangerous?"
+    options:
+      a: "Issues get automatically deleted"
+      b: "Claude Code accidentally creates public GitHub issues containing private project details"
+      c: "Issues are created but remain private"
+      d: "Only affects paid enterprise accounts"
+    correct: "b"
+    explanation: |
+      The GitHub Issue Auto-Creation Bug (#13797) causes Claude Code to accidentally create public GitHub issues containing private project details. Over 17 accidental disclosures documented, affecting v2.0.65+. The danger: internal code, architecture decisions, and private context leak publicly. Mitigation: disable the gh CLI tool or restrict GitHub permissions.
+    doc_reference:
+      file: "guide/known-issues.md"
+      section: "GitHub Issue Auto-Creation Bug"
+      anchor: "#github-issue-auto-creation-bug"
+
+  - id: "13-013"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "Which paths are protected by the bypassPermissions safety invariant, meaning Claude ALWAYS prompts before modifying them?"
+    options:
+      a: "Only .git/ and .env files"
+      b: ".git/, .claude/, shell configs (.bashrc, .zshrc), .gitconfig, .mcp.json, and .claude.json"
+      c: "All dotfiles in the home directory"
+      d: "Any file larger than 100KB"
+    correct: "b"
+    explanation: |
+      The bypassPermissions safety invariant protects a specific set of high-impact paths: .git/ (repository integrity), .claude/ (agent configuration, excluding .claude/worktrees/), shell config files (.bashrc, .zshrc — modifying these can persist malicious behavior across sessions), .gitconfig, .mcp.json, and .claude.json. Even when bypassPermissions is enabled, Claude always surfaces a confirmation prompt before touching these paths. The rationale: mistakes in these files have outsized, hard-to-reverse consequences.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "1.4 Permission Modes"
+      anchor: "#bypasspermissions-safety-invariant"
+
+  - id: "13-014"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What is the root cause of Cache Bug 2, and what is its cost impact on --resume sessions?"
+    options:
+      a: "The API rate limiter resets token counters, causing full context re-reads on each resume"
+      b: "The JSONL writer strips deferred_tools_delta records before writing; on --resume, full re-announcement shifts all message positions, producing 0% cache hit rate and 87-118K tokens rebuilt per resume"
+      c: "Cache TTL expires after 5 minutes of inactivity, forcing a full context reload"
+      d: "Tool call results are not serialized, so they are regenerated from scratch on each resume"
+    correct: "b"
+    explanation: |
+      Cache Bug 2 root cause: the JSONL writer strips DTD (deferred_tools_delta) records before writing the conversation to disk. When a session is resumed with --resume, Claude performs a full re-announcement of all tools, which shifts the position of every subsequent message. Because Anthropic's prompt cache is position-sensitive, these shifted positions produce a 0% cache hit rate. Cost impact: 87,000 to 118,000 tokens are rebuilt from scratch on every --resume. Workaround: avoid using --resume for long sessions until the bug is fixed.
+    doc_reference:
+      file: "guide/core/known-issues.md"
+      section: "Prompt Cache Bugs"
+      anchor: "#prompt-cache-bugs"
+
+  - id: "13-015"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What does CLAUDE_CODE_ATTRIBUTION_HEADER=false address, and why is its impact considered marginal compared to Cache Bug 2?"
+    options:
+      a: "It disables all request headers, eliminating the session tracking overhead that causes Bug 2"
+      b: "It removes the attribution header from API requests (workaround for Cache Bug 3), but Bug 3 has minor cost impact compared to Bug 2's 87-118K token rebuild per resume"
+      c: "It disables code attribution in generated files, reducing token usage by 30%"
+      d: "It prevents Claude from adding co-author comments to commits, speeding up git operations"
+    correct: "b"
+    explanation: |
+      CLAUDE_CODE_ATTRIBUTION_HEADER=false is the workaround for Cache Bug 3, which involves the attribution header affecting cache behavior. However, Cache Bug 3's cost impact is marginal in practice. Cache Bug 2 — the JSONL writer stripping deferred_tools_delta records and causing 0% cache hit rate on --resume — is the dominant issue, rebuilding 87,000 to 118,000 tokens per resume. Fixing Bug 3 without addressing Bug 2 produces negligible savings for teams that regularly use --resume.
+    doc_reference:
+      file: "guide/core/known-issues.md"
+      section: "Prompt Cache Bugs"
+      anchor: "#prompt-cache-bugs"

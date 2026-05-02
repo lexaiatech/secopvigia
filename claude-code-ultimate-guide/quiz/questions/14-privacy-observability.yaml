@@ -1,0 +1,247 @@
+category: "Privacy & Observability"
+category_id: 14
+source_file: "guide/data-privacy.md"
+
+questions:
+  - id: "14-001"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power", "pm"]
+    question: "What is the default data retention period for Claude Code conversations?"
+    options:
+      a: "30 days"
+      b: "1 year"
+      c: "5 years"
+      d: "Forever"
+    correct: "c"
+    explanation: |
+      Default retention is 5 years with data used for model training. By opting out of training at claude.ai/settings/data-privacy-controls, retention reduces to 30 days (safety monitoring only). Enterprise API (ZDR) has 0-day retention.
+    doc_reference:
+      file: "guide/data-privacy.md"
+      section: "TL;DR - Retention Summary"
+      anchor: "#tldr---retention-summary"
+
+  - id: "14-002"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "What data is sent to Anthropic when using Claude Code?"
+    options:
+      a: "Only your prompts"
+      b: "Prompts, files Claude reads, MCP results, Bash outputs, error messages"
+      c: "Only code snippets you copy-paste"
+      d: "Hashed metadata only"
+    correct: "b"
+    explanation: |
+      Everything Claude sees is sent: your prompts, files Claude reads (including .env if not excluded!), MCP server results (SQL queries, API responses), Bash command outputs, and error messages with stack traces. Use permissions.deny to block sensitive files.
+    doc_reference:
+      file: "guide/data-privacy.md"
+      section: "What Leaves Your Machine"
+      anchor: "#what-leaves-your-machine"
+
+  - id: "14-003"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is the risk when connecting a database via MCP?"
+    options:
+      a: "Database might slow down"
+      b: "Query results (including PII) are sent to Anthropic and stored per retention policy"
+      c: "Claude might drop tables"
+      d: "MCP uses too many tokens"
+    correct: "b"
+    explanation: |
+      When MCP executes a database query, ALL results are sent to Anthropic: "SELECT * FROM orders" → 100 rows with customer names, emails, addresses → stored according to your retention tier. NEVER connect production databases. Use dev/staging with anonymized data.
+    doc_reference:
+      file: "guide/data-privacy.md"
+      section: "Risk 2: MCP Database Access"
+      anchor: "#risk-2-mcp-database-access"
+
+  - id: "14-004"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "How can you reduce Claude Code data retention from 5 years to 30 days?"
+    options:
+      a: "Delete ~/.claude folder"
+      b: "Disable 'Allow model training' at claude.ai/settings/data-privacy-controls"
+      c: "Use incognito mode"
+      d: "Add --no-retention flag"
+    correct: "b"
+    explanation: |
+      Visit claude.ai/settings/data-privacy-controls and toggle OFF "Allow model training". This immediately reduces retention from 5 years to 30 days (safety monitoring only). Enterprise API (ZDR) provides 0-day retention for HIPAA/GDPR compliance.
+    doc_reference:
+      file: "guide/data-privacy.md"
+      section: "Opt-Out of Training"
+      anchor: "#41-opt-out-of-training"
+
+  - id: "14-005"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is the Enterprise API (ZDR) data retention policy?"
+    options:
+      a: "30 days retention"
+      b: "1 year retention"
+      c: "0 days (real-time processing only, data not stored)"
+      d: "5 years like default"
+    correct: "c"
+    explanation: |
+      Enterprise API (Zero Data Retention) has 0-day retention - data is processed in real-time and not stored. Required for HIPAA, GDPR, PCI-DSS compliance and government contracts. Requires enterprise contract with Anthropic.
+    doc_reference:
+      file: "guide/data-privacy.md"
+      section: "Tier 3: Enterprise API (Zero Data Retention)"
+      anchor: "#tier-3-enterprise-api-zero-data-retention"
+
+  - id: "14-006"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "What is the recommended session search tool from the guide?"
+    options:
+      a: "claude-conversation-extractor"
+      b: "session-search.sh (zero-dependency bash script)"
+      c: "ran CLI (npm)"
+      d: "Built-in /search command"
+    correct: "b"
+    explanation: |
+      session-search.sh is the recommended tool: zero dependencies (bash only), fast (~10ms list, ~400ms search), displays ready-to-use 'claude --resume' commands. Install with alias 'cs' for quick access. Alternative Python tools exist but are slower.
+    doc_reference:
+      file: "guide/observability.md"
+      section: "Recommended: session-search.sh"
+      anchor: "#recommended-session-searchsh"
+
+  - id: "14-007"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What hook event is used for session logging?"
+    options:
+      a: "PreToolUse"
+      b: "PostToolUse"
+      c: "SessionStart"
+      d: "Notification"
+    correct: "b"
+    explanation: |
+      Session logging uses PostToolUse hook - it runs after each tool completes, capturing tool name, file path, project, and token estimates. Configure in settings.json with the session-logger.sh script. Logs are stored as JSONL files in ~/.claude/logs/.
+    doc_reference:
+      file: "guide/observability.md"
+      section: "Register in Settings"
+      anchor: "#2-register-in-settings"
+
+  - id: "14-008"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What is the token estimation method used by the session logger?"
+    options:
+      a: "API-provided exact counts"
+      b: "~4 characters per token (heuristic, slightly overestimates)"
+      c: "1 word = 1 token"
+      d: "Based on file size only"
+    correct: "b"
+    explanation: |
+      The logger estimates tokens using ~4 characters per token heuristic. This is approximate and tends to slightly overestimate. Claude Code CLI doesn't expose actual API token metrics, so estimates have ~15-25% variance from actual billing.
+    doc_reference:
+      file: "guide/observability.md"
+      section: "Token Estimation Method"
+      anchor: "#token-estimation-method"
+
+  - id: "14-009"
+    difficulty: "intermediate"
+    profiles: ["senior", "power"]
+    question: "What CANNOT the session monitoring do?"
+    options:
+      a: "Track tool usage counts"
+      b: "Identify file access patterns"
+      c: "Provide exact token counts and actual API costs"
+      d: "Record operation timestamps"
+    correct: "c"
+    explanation: |
+      Monitoring CANNOT provide: exact token counts (CLI doesn't expose API metrics), actual API costs (estimates only), TTFT timing, real-time streaming metrics, or context window usage. It CAN track: tool usage counts, file access patterns, relative comparisons, operation timing.
+    doc_reference:
+      file: "guide/observability.md"
+      section: "What This Monitoring CANNOT Do"
+      anchor: "#what-this-monitoring-cannot-do"
+
+  - id: "14-010"
+    difficulty: "junior"
+    profiles: ["junior", "senior", "power"]
+    question: "Where are Claude Code session logs stored locally?"
+    options:
+      a: "~/.config/claude/"
+      b: "~/.claude/projects/<project>/"
+      c: "/var/log/claude/"
+      d: "In the cloud only"
+    correct: "b"
+    explanation: |
+      Sessions are stored locally at ~/.claude/projects/<project>/ as JSONL files. This enables session resume with 'claude --resume <id>' or 'claude -c' for most recent. Custom logs from session-logger.sh go to ~/.claude/logs/ (configurable via CLAUDE_LOG_DIR).
+    doc_reference:
+      file: "guide/observability.md"
+      section: "Native Commands"
+      anchor: "#native-commands"
+
+  - id: "14-011"
+    difficulty: "intermediate"
+    profiles: ["junior", "senior", "power"]
+    question: "When should you use 'Co-Authored-By' vs 'Assisted-By' in git commits?"
+    options:
+      a: "Always use Co-Authored-By for any AI involvement"
+      b: "Co-Authored-By when AI generated significant code, Assisted-By when AI only advised or reviewed"
+      c: "Never attribute AI in commits"
+      d: "Use both on every commit"
+    correct: "b"
+    explanation: |
+      AI traceability in git commits:
+
+      - **Co-Authored-By**: When AI generated significant portions of code (implementation, refactoring)
+      - **Assisted-By**: When AI only advised, reviewed, or suggested minor changes
+
+      This distinction matters for code ownership, audit trails, and understanding who (or what) actually wrote the code. Some teams add this to CLAUDE.md as a mandatory commit convention.
+    doc_reference:
+      file: "guide/ultimate-guide.md"
+      section: "AI Traceability"
+      anchor: "#ai-traceability"
+
+  - id: "14-012"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What does CLAUDE_CODE_SUBPROCESS_ENV_SCRUB do and why is it needed?"
+    options:
+      a: "It clears the terminal output after each command"
+      b: "It prevents sensitive environment variables from leaking into subprocess contexts (e.g., MCP servers, hooks)"
+      c: "It disables all environment variable expansion in bash commands"
+      d: "It encrypts environment variables before they are passed to Claude"
+    correct: "b"
+    explanation: |
+      CLAUDE_CODE_SUBPROCESS_ENV_SCRUB is a security control that prevents sensitive env vars (API keys, tokens, secrets) from leaking into subprocess contexts. Without it, environment variables present in the parent shell are inherited by MCP server processes, hooks, and spawned subprocesses. Set it to a comma-separated list of var names to scrub, or use a glob pattern. Critical for teams where Claude runs in environments with production credentials.
+    doc_reference:
+      file: "guide/security/data-privacy.md"
+      section: "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB"
+      anchor: "#claude_code_subprocess_env_scrub"
+
+  - id: "14-013"
+    difficulty: "senior"
+    profiles: ["senior", "power"]
+    question: "What does sandbox.failIfUnavailable control in Claude Code settings?"
+    options:
+      a: "Whether Claude Code crashes when the network is unavailable"
+      b: "Whether Claude Code refuses to run if its sandbox isolation layer cannot be activated"
+      c: "Whether MCP servers fail gracefully when their sandbox times out"
+      d: "Whether hooks are skipped when the sandbox is busy"
+    correct: "b"
+    explanation: |
+      sandbox.failIfUnavailable (boolean, default: false) controls whether Claude Code hard-fails when sandbox isolation cannot be activated. Set to true in production/CI environments to enforce that every session runs inside the sandbox — no silent fallback to unsandboxed mode. Set to false in dev environments where sandbox may not be available (e.g., certain Linux kernels or Docker-in-Docker). Part of the defense-in-depth configuration.
+    doc_reference:
+      file: "guide/security/sandbox-native.md"
+      section: "sandbox.failIfUnavailable"
+      anchor: "#sandboxfaililunavailable"
+
+  - id: "14-014"
+    difficulty: "power"
+    profiles: ["power"]
+    question: "What is the X-Claude-Code-Session-Id header and how should it be handled in nginx?"
+    options:
+      a: "A header that Claude Code injects to authenticate API requests, should be removed before forwarding"
+      b: "A session correlation header sent on every Claude Code API request, useful for tracing; nginx should pass it through to upstream services"
+      c: "A rate-limiting header that nginx uses to throttle Claude Code traffic"
+      d: "A header that identifies the Claude model version, set by Anthropic servers"
+    correct: "b"
+    explanation: |
+      X-Claude-Code-Session-Id is a session correlation header that Claude Code attaches to every outbound API request. It enables distributed tracing: you can correlate a session's tool calls, API requests, and logs across microservices. In nginx, pass it through to upstream: `proxy_pass_header X-Claude-Code-Session-Id;`. In observability stacks, use it as a trace root to group all activity from a single Claude session.
+    doc_reference:
+      file: "guide/ops/observability.md"
+      section: "X-Claude-Code-Session-Id"
+      anchor: "#x-claude-code-session-id"
