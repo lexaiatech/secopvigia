@@ -1,5 +1,5 @@
 /* ─── FONTS ──────────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ─── TOKENS ─────────────────────────────────────────────────────────────── */
 :root {
@@ -43,8 +43,9 @@
   --sidebar-text: #86ABAD;
   --sidebar-hover: #0D2714;
 
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'Manrope', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
   --r: 8px;
   --r2: 12px;
   --r3: 18px;
@@ -293,8 +294,8 @@ html, body {
   text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px;
 }
 .metric-card .mc-val {
-  font-family:var(--font-display); font-size:32px; font-weight:800;
-  color:var(--text); letter-spacing:-.8px; line-height:1;
+  font-family:var(--font-mono); font-size:30px; font-weight:700;
+  color:var(--text); letter-spacing:-.5px; line-height:1;
 }
 .metric-card .mc-sub { font-size:11px; color:var(--text3); margin-top:7px; display:flex; align-items:center; gap:4px; }
 .mc-val.red   { color:var(--red); }
@@ -339,7 +340,7 @@ tr:hover td { background:var(--bg); }
 .risk-bar-wrap { display:flex; align-items:center; gap:8px; }
 .risk-bar  { height:5px; border-radius:3px; flex:1; background:var(--bg2); overflow:hidden; }
 .risk-fill { height:100%; border-radius:3px; }
-.risk-val  { font-size:11px; font-weight:700; width:28px; text-align:right; }
+.risk-val  { font-family:var(--font-mono); font-size:11px; font-weight:600; width:28px; text-align:right; }
 .action-btn {
   padding:5px 10px; font-size:11px; font-weight:600; border-radius:6px;
   border:1px solid var(--border); background:var(--surface); color:var(--text2);
@@ -382,19 +383,19 @@ tr:hover td { background:var(--bg); }
 .stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
 .stat-item { background:var(--surface); border:1px solid var(--border2); border-radius:10px; padding:12px 14px; }
 .stat-lbl { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:4px; font-weight:700; }
-.stat-val { font-family:var(--font-display); font-size:20px; font-weight:800; color:var(--text); }
+.stat-val { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
 
 /* ─── GAUGE ──────────────────────────────────────────────────────────────── */
 .gauge-wrap { display:flex; flex-direction:column; align-items:center; }
 .gauge-svg  { width:160px; height:90px; }
-.gauge-val  { font-family:var(--font-display); font-size:34px; font-weight:800; color:var(--text); margin-top:-8px; }
+.gauge-val  { font-family:var(--font-mono); font-size:32px; font-weight:700; color:var(--text); margin-top:-8px; }
 .gauge-lbl  { font-size:11px; color:var(--text3); margin-top:2px; font-weight:500; }
 .risk-breakdown { display:flex; flex-direction:column; gap:8px; margin-top:14px; }
 .rb-row   { display:flex; align-items:center; gap:10px; }
 .rb-label { font-size:12px; color:var(--text2); width:100px; flex-shrink:0; font-weight:500; }
 .rb-track { flex:1; height:6px; background:var(--bg2); border-radius:3px; overflow:hidden; }
 .rb-fill  { height:100%; border-radius:3px; }
-.rb-val   { font-size:11px; font-weight:700; color:var(--text); width:28px; text-align:right; }
+.rb-val   { font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--text); width:28px; text-align:right; }
 
 /* ─── WATCHLIST ──────────────────────────────────────────────────────────── */
 .watch-item {
@@ -560,7 +561,7 @@ tr:hover td { background:var(--bg); }
 .bc-label  { font-size:12px; color:var(--text3); width:130px; flex-shrink:0; text-align:right; font-weight:500; }
 .bc-track  { flex:1; height:10px; background:var(--bg2); border-radius:5px; overflow:hidden; }
 .bc-fill   { height:100%; border-radius:5px; }
-.bc-val    { font-size:12px; font-weight:700; color:var(--text); width:50px; }
+.bc-val    { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--text); width:50px; }
 
 /* ─── PAGE SECTIONS ──────────────────────────────────────────────────────── */
 .page-header { margin-bottom:22px; }
@@ -583,3 +584,23 @@ tr:hover td { background:var(--bg); }
   animation:shimmer 1.4s infinite;
   border-radius:6px;
 }
+
+/* ─── MONO UTILITY ───────────────────────────────────────────────────────── */
+/* Aplicar a cualquier dato numérico, NIT, fecha, código */
+.mono { font-family:var(--font-mono); }
+
+/* Celdas de tabla: valores numéricos y referencias en mono */
+td { font-family:var(--font-mono); font-size:12px; letter-spacing:-.2px; }
+.tbl-entity { font-family:var(--font-body); font-size:13px; font-weight:600; }
+.tbl-meta   { font-family:var(--font-mono); font-size:11px; }
+th { font-family:var(--font-body); }
+
+/* Badge con mono para porcentajes/scores */
+.badge { font-family:var(--font-mono); }
+
+/* Marca de tiempo en alertas y timeline */
+.ar-time  { font-family:var(--font-mono); }
+.tl-time2 { font-family:var(--font-mono); }
+
+/* Login — campo de input en mono para que las credenciales se vean técnicas */
+.login-input { font-family:var(--font-mono); }
