@@ -126,15 +126,15 @@ function Onboarding({ onClose }: { onClose: () => void }) {
 }
 
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
-function Sidebar({ view, setView, onLogout, criticos }: { view: ViewId; setView: (v: ViewId) => void; onLogout: () => void; criticos: number }) {
+function Sidebar({ view, setView, onLogout, criticos, open, onClose }: { view: ViewId; setView: (v: ViewId) => void; onLogout: () => void; criticos: number; open: boolean; onClose: () => void }) {
   const nav = (id: ViewId, icon: React.ReactNode, label: string, badge?: { text: string; amber?: boolean }) => (
-    <div className={`nav-item${view === id ? ' active' : ''}`} onClick={() => setView(id)}>
+    <div className={`nav-item${view === id ? ' active' : ''}`} onClick={() => { setView(id); onClose() }}>
       {icon}{label}
       {badge && <span className={`nav-badge${badge.amber ? ' amber' : ''}`}>{badge.text}</span>}
     </div>
   )
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? ' open' : ''}`}>
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
         <div><div className="sidebar-logo-name">SECOP Vigía</div><div className="sidebar-logo-sub">Anticorrupción</div></div>
@@ -863,6 +863,7 @@ export default function SecopVigia() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [view, setView] = useState<ViewId>('dashboard')
+  const [mobileNav, setMobileNav] = useState(false)
   const [ai, setAi] = useState<AI>({})
   const [search, setSearch] = useState('')
   const [secop, setSecop] = useState<SecopResponse | null>(null)
@@ -907,9 +908,13 @@ export default function SecopVigia() {
   return (
     <div className="app">
       {showOnboarding && <Onboarding onClose={() => setShowOnboarding(false)} />}
-      <Sidebar view={view} setView={setView} onLogout={() => setLoggedIn(false)} criticos={criticos} />
+      {mobileNav && <div className="mob-overlay" onClick={() => setMobileNav(false)} />}
+      <Sidebar view={view} setView={setView} onLogout={() => setLoggedIn(false)} criticos={criticos} open={mobileNav} onClose={() => setMobileNav(false)} />
       <div className="main">
         <div className="topbar">
+          <button className="mob-menu-btn" onClick={() => setMobileNav(true)} aria-label="Abrir menú">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
           <div>
             <div className="topbar-title">{VIEW_LABELS[view]}</div>
             <div className="topbar-breadcrumb"><span>SECOP Vigía</span><span>›</span><span>{VIEW_LABELS[view]}</span></div>

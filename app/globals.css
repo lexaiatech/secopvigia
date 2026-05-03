@@ -577,6 +577,110 @@ tr:hover td { background:var(--bg); }
 .net-node circle { transition:r .15s, opacity .15s; }
 .net-node:hover circle { opacity:1 !important; }
 
+/* ─── HAMBURGER (hidden on desktop) ─────────────────────────────────────── */
+.mob-menu-btn {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text2); cursor: pointer; flex-shrink: 0;
+  transition: background .15s;
+}
+.mob-menu-btn:hover { background: var(--bg); }
+
+/* Overlay backdrop (only visible on mobile when sidebar open) */
+.mob-overlay { display: none; }
+
+/* ─── MOBILE ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Sidebar desliza desde la izquierda */
+  .sidebar {
+    position: fixed;
+    top: 0; bottom: 0; left: -260px;
+    width: 260px;
+    z-index: 200;
+    transition: left .25s cubic-bezier(0.16,1,0.3,1);
+    box-shadow: none;
+  }
+  .sidebar.open {
+    left: 0;
+    box-shadow: 8px 0 40px rgba(0,0,0,0.45);
+  }
+
+  /* Overlay oscuro detrás del sidebar */
+  .mob-overlay {
+    display: block;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 199;
+    animation: fadeIn .2s ease;
+  }
+
+  /* Mostrar botón hamburguesa */
+  .mob-menu-btn { display: flex; }
+
+  /* Topbar compacto */
+  .topbar { padding: 0 14px; gap: 10px; }
+  .topbar-breadcrumb { display: none; }
+  .topbar-search { display: none; }
+  .topbar-btn span, .topbar-btn > *:not(svg) { display: none; }
+  .topbar-btn { padding: 6px 10px; }
+
+  /* Contenido con menos padding */
+  .content { padding: 14px; }
+
+  /* Login en móvil */
+  .login-card { width: 92%; padding: 36px 24px; }
+
+  /* Grids → columna única */
+  .grid4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { grid-template-columns: 1fr; gap: 10px; }
+  .grid2 { grid-template-columns: 1fr; gap: 10px; }
+  .stat-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* Page header más compacto */
+  .page-title { font-size: 18px; }
+  .page-header { margin-bottom: 14px; }
+
+  /* Metric cards más compactas */
+  .metric-card { padding: 14px 16px; }
+  .metric-card .mc-val { font-size: 24px; }
+
+  /* Cards */
+  .card { padding: 16px; }
+
+  /* Tabla horizontal scroll */
+  .tbl-wrap { margin: -16px; border-radius: 0; }
+  td, th { padding: 10px 12px; white-space: nowrap; }
+
+  /* Filter bar en columna */
+  .filter-bar { flex-direction: column; gap: 8px; }
+  .filter-input { min-width: 0; width: 100%; }
+  .filter-select { width: 100%; }
+
+  /* AI panel */
+  .chip { font-size: 11px; padding: 4px 10px; }
+  .ai-input-row { flex-direction: column; }
+  .ai-send { width: 100%; }
+
+  /* Watchlist */
+  .watch-name { font-size: 12px; }
+
+  /* Bar chart labels más cortos */
+  .bc-label { width: 90px; font-size: 11px; }
+
+  /* Profile stats */
+  .profile-header { flex-direction: column; gap: 12px; }
+
+  /* Compare columns → stack */
+  .compare-col { width: 100%; }
+
+  /* Onboarding card */
+  .ob-card { padding: 28px 20px; }
+}
+
 /* ─── SKELETON ───────────────────────────────────────────────────────────── */
 .skeleton {
   background:linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
